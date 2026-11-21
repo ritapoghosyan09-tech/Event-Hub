@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EVENT HUB design system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE   calm, assured, a little ceremonial — the tone of a good concert hall
+   IDEA    the printed programme and the ticket stub: big serif titles, a perforated tear between picture and facts
+   PICTURE the homepage's first screen as a live specimen: hero, search, chips, three ticket-stub cards
+   COLOUR  ivory canvas, dusty navy ink and actions, lavender only for selection, beige for quiet fills
+   TYPE    Bodoni Moda display / Hanken Grotesk text; LAYOUT left-aligned, one 1240px column, bands full width */
+/* ==========================================================================
+   EVENT HUB — design tokens v0.1
+   Source of truth for colour, type, space, radius, elevation and motion.
+   Components use the SEMANTIC tokens (--eh-surface, --eh-text …), never the
+   primitives directly, so a future dark theme only remaps semantics.
+
+   Contrast (WCAG 2.2, measured):
+     navy  #293D56 on cream #FAF8F4 ... 10.4:1   body text, headings
+     navy  #293D56 on ivory #F5F0E8 ...  9.8:1
+     blue  #526780 on cream ...........  5.5:1   secondary text (AA)
+     gray  #6F6A63 on cream ...........  5.1:1   meta text (AA)
+     cream on navy ....................  10.4:1  primary button label
+     navy  on lavender #C9C1D9 ........  6.4:1   selected chip
+     blue  on beige #E6D9C9 ...........  4.2:1   large text / icons ONLY
+   ========================================================================== */
+
+:root {
+  /* ---- Primitives: the brand palette (confirmed in brief) ---------------- */
+  --eh-ivory: #f5f0e8;      /* warm ivory — page canvas */
+  --eh-cream: #faf8f4;      /* soft cream — raised surfaces, cards */
+  --eh-beige: #e6d9c9;      /* beige — quiet fills, dividers, tags */
+  --eh-navy: #293d56;       /* dusty navy — primary ink + primary actions */
+  --eh-blue: #526780;       /* muted blue — secondary ink, links */
+  --eh-lavender: #c9c1d9;   /* soft lavender — selection, accents */
+
+  /* ---- Primitives: derived (recommendation, not in brief) ---------------- */
+  --eh-navy-deep: #1e2d40;  /* pressed state, footer ground */
+  --eh-navy-hover: #1f3047;
+  --eh-lavender-tint: #ece8f3;
+  --eh-lavender-deep: #5e5478; /* lavender as text: 6.6:1 on cream */
+  --eh-beige-deep: #d6c5b0;    /* borders on ivory */
+  --eh-gray-600: #6f6a63;      /* "warm gray" from the brief, tuned for AA */
+  --eh-gray-400: #8c867e;      /* disabled, placeholders (3.4:1 — non-essential only) */
+  --eh-gray-200: #e3ded6;
+  --eh-white: #ffffff;
+  --eh-red: #9b3d3d;    /* muted, not alarm-red: errors */
+  --eh-green: #3d6b52;  /* confirmed, available */
+  --eh-amber: #8a6420;  /* few tickets left */
+
+  /* ---- Semantic: surfaces ------------------------------------------------- */
+  --eh-canvas: var(--eh-ivory);
+  --eh-surface: var(--eh-cream);
+  --eh-surface-sunken: var(--eh-beige);
+  --eh-surface-inverse: var(--eh-navy);
+  --eh-surface-accent: var(--eh-lavender-tint);
+
+  /* ---- Semantic: text ----------------------------------------------------- */
+  --eh-text: var(--eh-navy);
+  --eh-text-strong: var(--eh-navy-deep);
+  --eh-text-muted: var(--eh-blue);
+  --eh-text-subtle: var(--eh-gray-600);
+  --eh-text-disabled: var(--eh-gray-400);
+  --eh-text-inverse: var(--eh-cream);
+  --eh-text-accent: var(--eh-lavender-deep);
+  --eh-link: var(--eh-blue);
+
+  /* ---- Semantic: lines & focus ------------------------------------------- */
+  --eh-border: var(--eh-beige-deep);
+  --eh-border-subtle: var(--eh-gray-200);
+  --eh-border-strong: var(--eh-blue);
+  --eh-focus-ring: 0 0 0 2px var(--eh-cream), 0 0 0 4px var(--eh-blue);
+
+  /* ---- Semantic: actions -------------------------------------------------- */
+  --eh-action: var(--eh-navy);
+  --eh-action-hover: var(--eh-navy-hover);
+  --eh-action-pressed: var(--eh-navy-deep);
+  --eh-action-text: var(--eh-cream);
+  --eh-action-secondary: transparent;
+  --eh-action-secondary-border: var(--eh-navy);
+  --eh-selected: var(--eh-lavender);
+
+  /* ---- Semantic: status --------------------------------------------------- */
+  --eh-success: var(--eh-green);
+  --eh-warning: var(--eh-amber);
+  --eh-danger: var(--eh-red);
+
+  /* ---- Typography --------------------------------------------------------
+     Display: Bodoni Moda (high-contrast, programme/playbill lineage).
+     Text:    Hanken Grotesk (quiet, open, excellent at small sizes).
+     Armenian/Cyrillic fallbacks are listed in case the launch market needs
+     them (open question) — neither primary face covers Armenian script. */
+  --eh-font-display: "Bodoni Moda", "Noto Serif Armenian", "Didot", "Bodoni 72", Georgia, serif;
+  --eh-font-text: "Hanken Grotesk", "Noto Sans Armenian", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Modular scale, ratio 1.25 from 16px, display sizes fluid */
+  --eh-text-xs: 0.8125rem;   /* 13 — legal, captions (minimum) */
+  --eh-text-sm: 0.875rem;    /* 14 — meta, labels */
+  --eh-text-base: 1rem;      /* 16 — body, inputs */
+  --eh-text-lg: 1.25rem;     /* 20 — lead paragraphs, card titles */
+  --eh-text-xl: 1.5625rem;   /* 25 — section titles (text face) */
+  --eh-display-sm: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);   /* 28→40 */
+  --eh-display-md: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);  /* 36→60 */
+  --eh-display-lg: clamp(2.75rem, 1.6rem + 5vw, 6rem);       /* 44→96 hero */
+
+  --eh-leading-tight: 1.04;  /* display */
+  --eh-leading-snug: 1.3;    /* card titles */
+  --eh-leading-body: 1.6;
+  --eh-tracking-display: -0.02em;
+  --eh-measure: 66ch;
+
+  /* ---- Space: 4px base, used in steps of 8 for layout -------------------- */
+  --eh-space-1: 0.25rem;  /* 4 */
+  --eh-space-2: 0.5rem;   /* 8 */
+  --eh-space-3: 0.75rem;  /* 12 */
+  --eh-space-4: 1rem;     /* 16 */
+  --eh-space-5: 1.5rem;   /* 24 */
+  --eh-space-6: 2rem;     /* 32 */
+  --eh-space-7: 3rem;     /* 48 */
+  --eh-space-8: 4rem;     /* 64 */
+  --eh-space-9: 6rem;     /* 96 */
+  --eh-space-10: 8rem;    /* 128 — between homepage bands on desktop */
+  --eh-gutter: max(5vw, 1rem);
+  --eh-content-max: 77.5rem; /* 1240 */
+
+  /* ---- Radius: hierarchy, not one value everywhere ----------------------- */
+  --eh-radius-xs: 4px;     /* tags, small badges */
+  --eh-radius-sm: 10px;    /* inputs */
+  --eh-radius-md: 16px;    /* cards */
+  --eh-radius-lg: 28px;    /* hero search, sheets, modals */
+  --eh-radius-pill: 999px; /* buttons, chips */
+
+  /* ---- Elevation: navy-tinted, used sparingly (hover, overlays) ---------- */
+  --eh-shadow-rest: 0 1px 0 rgba(41, 61, 86, 0.06);
+  --eh-shadow-hover: 0 18px 40px -22px rgba(41, 61, 86, 0.35);
+  --eh-shadow-overlay: 0 24px 64px -24px rgba(30, 45, 64, 0.45);
+
+  /* ---- Motion ------------------------------------------------------------ */
+  --eh-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --eh-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --eh-duration-fast: 140ms;  /* colour, focus */
+  --eh-duration-base: 240ms;  /* hover lifts, chip select */
+  --eh-duration-slow: 600ms;  /* the one page-load reveal; image zoom */
+
+  /* ---- Imagery ----------------------------------------------------------- */
+  --eh-image-ratio-card: 4 / 3;
+  --eh-image-ratio-hero: 16 / 10;
+  --eh-image-ratio-detail: 21 / 9;
+  --eh-image-scrim: linear-gradient(180deg, rgba(30, 45, 64, 0) 45%, rgba(30, 45, 64, 0.72) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --eh-duration-fast: 0ms;
+    --eh-duration-base: 0ms;
+    --eh-duration-slow: 0ms;
+  }
+}
+
+:root{color-scheme:light}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--eh-canvas);color:var(--eh-text);font:400 var(--eh-text-base)/var(--eh-leading-body) var(--eh-font-text);overflow-x:clip;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--eh-content-max);margin:0 auto;padding-inline:var(--eh-gutter)}
+.band{padding-block:clamp(40px,6vw,96px)}
+.band+.band{border-top:1px solid var(--eh-border)}
+h1,h2,h3{font-family:var(--eh-font-display);font-weight:500;letter-spacing:var(--eh-tracking-display);line-height:var(--eh-leading-tight);margin:0;text-wrap:balance}
+h2{font-size:var(--eh-display-sm);margin-bottom:var(--eh-space-3)}
+h3{font-family:var(--eh-font-text);font-weight:600;font-size:var(--eh-text-lg);letter-spacing:0;line-height:var(--eh-leading-snug)}
+p{margin:0}
+.lead{color:var(--eh-text-muted);font-size:var(--eh-text-lg);max-width:var(--eh-measure)}
+.note{color:var(--eh-text-subtle);font-size:var(--eh-text-sm)}
+a{color:var(--eh-link);text-underline-offset:3px}
+:focus-visible{outline:none;box-shadow:var(--eh-focus-ring)}
+
+/* ---------- Navigation ---------- */
+.nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--eh-space-5);padding-block:var(--eh-space-5)}
+.mark{font-family:var(--eh-font-display);font-size:1.6rem;font-weight:600;letter-spacing:.01em;color:var(--eh-text-strong);text-decoration:none;margin-right:auto}
+.nav a.l{color:var(--eh-text);text-decoration:none;font-weight:500;font-size:var(--eh-text-sm)}
+.nav a.l:hover{text-decoration:underline}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:var(--eh-radius-pill);border:1px solid transparent;font:600 var(--eh-text-sm)/1 var(--eh-font-text);cursor:pointer;transition:background var(--eh-duration-fast),color var(--eh-duration-fast),transform var(--eh-duration-fast) var(--eh-ease-out);text-decoration:none;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--eh-action);color:var(--eh-action-text)}
+.btn-primary:hover{background:var(--eh-action-hover)}
+.btn-primary:active{background:var(--eh-action-pressed)}
+.btn-secondary{background:transparent;color:var(--eh-text);border-color:var(--eh-action-secondary-border)}
+.btn-secondary:hover{background:var(--eh-surface)}
+.btn-quiet{background:var(--eh-surface-sunken);color:var(--eh-text)}
+.btn-quiet:hover{background:var(--eh-beige-deep)}
+.btn[disabled]{background:var(--eh-gray-200);color:var(--eh-text-disabled);cursor:not-allowed;border-color:transparent}
+.btn-lg{min-height:52px;padding:0 28px;font-size:var(--eh-text-base)}
+
+/* ---------- Hero specimen ---------- */
+.hero{padding-block:clamp(32px,6vw,88px) clamp(32px,4vw,56px)}
+.hero h1{font-size:var(--eh-display-lg);font-weight:500;max-width:14ch;color:var(--eh-text-strong)}
+.hero .lead{margin-top:var(--eh-space-5)}
+.reveal{animation:rise var(--eh-duration-slow) var(--eh-ease-out) both}
+.reveal.d2{animation-delay:90ms}.reveal.d3{animation-delay:180ms}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.search{margin-top:var(--eh-space-6);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr) auto;align-items:stretch;background:var(--eh-surface);border:1px solid var(--eh-border);border-radius:var(--eh-radius-lg);padding:8px;box-shadow:var(--eh-shadow-rest);max-width:960px}
+.field{position:relative;display:flex;flex-direction:column;justify-content:center;padding:8px 18px;border-radius:20px;transition:background var(--eh-duration-fast)}
+.field+.field::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:1px;background:var(--eh-border-subtle)}
+.field:focus-within::before,.field:focus-within+.field::before{opacity:0}
+.field:focus-within{background:var(--eh-surface-accent)}
+.field label{font-size:var(--eh-text-xs);font-weight:600;color:var(--eh-text-muted)}
+.field input,.field select{border:0;background:transparent;font:inherit;font-size:16px;color:var(--eh-text);padding:2px 0;outline:none;width:100%;appearance:none}
+.field input::placeholder{color:var(--eh-text-disabled)}
+.search .btn{align-self:center;margin-left:6px}
+
+.chips{display:flex;flex-wrap:wrap;gap:var(--eh-space-2);margin-top:var(--eh-space-6)}
+.chip{min-height:40px;padding:0 16px;border-radius:var(--eh-radius-pill);border:1px solid var(--eh-border);background:transparent;color:var(--eh-text);font:500 var(--eh-text-sm) var(--eh-font-text);cursor:pointer;transition:background var(--eh-duration-base) var(--eh-ease-out),border-color var(--eh-duration-base)}
+.chip:hover{border-color:var(--eh-border-strong)}
+.chip[aria-pressed=true]{background:var(--eh-selected);border-color:var(--eh-selected);color:var(--eh-text-strong)}
+
+/* ---------- Event card: the ticket stub ---------- */
+.row-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--eh-space-3);margin-bottom:var(--eh-space-5)}
+.row-head h2{margin:0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.4vw,32px)}
+.card{position:relative;display:flex;flex-direction:column;background:var(--eh-surface);border-radius:var(--eh-radius-md);box-shadow:var(--eh-shadow-rest);transition:transform var(--eh-duration-base) var(--eh-ease-out),box-shadow var(--eh-duration-base) var(--eh-ease-out);color:inherit;text-decoration:none}
+.card:hover{transform:translateY(-4px);box-shadow:var(--eh-shadow-hover)}
+.card:hover .photo>svg{transform:scale(1.04)}
+.photo{position:relative;aspect-ratio:var(--eh-image-ratio-card);overflow:hidden;border-radius:var(--eh-radius-md) var(--eh-radius-md) 0 0;background:var(--eh-beige)}
+.photo>svg{position:absolute;inset:0;width:100%;height:100%;transition:transform var(--eh-duration-slow) var(--eh-ease-out)}
+.fav{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;display:grid;place-items:center;background:rgba(250,248,244,.92);color:var(--eh-navy);cursor:pointer;transition:transform var(--eh-duration-base) var(--eh-ease-out)}
+.fav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;transition:fill var(--eh-duration-base)}
+.fav[aria-pressed=true] svg{fill:var(--eh-navy)}
+.fav.pop{animation:pop 320ms var(--eh-ease-out)}
+@keyframes pop{40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.tear{position:relative;height:0;border-top:1.5px dashed var(--eh-border)}
+.tear::before,.tear::after{content:"";position:absolute;top:-11px;width:22px;height:22px;border-radius:50%;background:var(--eh-canvas)}
+.tear::before{left:-11px}.tear::after{right:-11px}
+.stub{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--eh-space-4);padding:var(--eh-space-5)}
+.date{display:flex;flex-direction:column;align-items:center;justify-content:center;width:56px;padding:6px 0 8px;border-right:1px solid var(--eh-border-subtle);padding-right:var(--eh-space-4);box-sizing:content-box}
+.date .m{font-size:var(--eh-text-xs);font-weight:600;color:var(--eh-text-muted)}
+.date .d{font-family:var(--eh-font-display);font-size:2.25rem;line-height:1;font-weight:500;color:var(--eh-text-strong)}
+.meta{font-size:var(--eh-text-sm);color:var(--eh-text-subtle);margin-top:4px}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:var(--eh-space-3)}
+.price{font-weight:600;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--eh-text-xs);font-weight:600;padding:3px 8px;border-radius:var(--eh-radius-xs);white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-warn{color:var(--eh-warning);background:#f6ecd9}
+.b-ok{color:var(--eh-success);background:#e4eee7}
+.b-off{color:var(--eh-text-subtle);background:var(--eh-gray-200)}
+.b-lav{color:var(--eh-text-accent);background:var(--eh-lavender-tint)}
+.sample{margin-top:var(--eh-space-4)}
+
+/* ---------- Spec sections ---------- */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(24px,4vw,64px)}
+.swatches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--eh-space-4)}
+.sw{border-radius:var(--eh-radius-md);overflow:hidden;background:var(--eh-surface);border:1px solid var(--eh-border-subtle)}
+.sw .c{height:96px;box-shadow:inset 0 -1px 0 var(--eh-border-subtle)}
+.sw .t{padding:12px 14px}
+.sw b{display:block;font-weight:600}
+.sw span{font-size:var(--eh-text-sm);color:var(--eh-text-subtle);display:block}
+.scale{display:flex;flex-direction:column;gap:var(--eh-space-5)}
+.scale .s{display:grid;grid-template-columns:9rem minmax(0,1fr);gap:var(--eh-space-4);align-items:baseline;border-bottom:1px solid var(--eh-border-subtle);padding-bottom:var(--eh-space-4)}
+.scale .k{font-size:var(--eh-text-sm);color:var(--eh-text-subtle)}
+.d-lg{font-family:var(--eh-font-display);font-size:var(--eh-display-lg);line-height:var(--eh-leading-tight);letter-spacing:var(--eh-tracking-display);font-weight:500}
+.d-md{font-family:var(--eh-font-display);font-size:var(--eh-display-md);line-height:var(--eh-leading-tight);letter-spacing:var(--eh-tracking-display);font-weight:500}
+.d-sm{font-family:var(--eh-font-display);font-size:var(--eh-display-sm);line-height:var(--eh-leading-tight);font-weight:500}
+.t-lg{font-size:var(--eh-text-lg);font-weight:600}
+.t-sm{font-size:var(--eh-text-sm);color:var(--eh-text-subtle)}
+.controls{display:flex;flex-wrap:wrap;gap:var(--eh-space-3);align-items:center;margin-bottom:var(--eh-space-5)}
+.input{display:flex;flex-direction:column;gap:6px;max-width:360px;margin-bottom:var(--eh-space-4)}
+.input label{font-size:var(--eh-text-sm);font-weight:600}
+.input input{min-height:48px;padding:0 14px;border:1px solid var(--eh-border);border-radius:var(--eh-radius-sm);background:var(--eh-white);font:inherit;font-size:16px;color:var(--eh-text);transition:border-color var(--eh-duration-fast)}
+.input input:hover{border-color:var(--eh-border-strong)}
+.input input:focus{outline:none;border-color:var(--eh-blue);box-shadow:0 0 0 3px var(--eh-lavender-tint)}
+.input.err input{border-color:var(--eh-danger)}
+.input .help{font-size:var(--eh-text-sm);color:var(--eh-text-subtle)}
+.input.err .help{color:var(--eh-danger)}
+table{width:100%;border-collapse:collapse;font-size:var(--eh-text-sm)}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--eh-border-subtle);vertical-align:top}
+th{font-weight:600;color:var(--eh-text-muted)}
+td:first-child{white-space:nowrap;font-weight:600}
+.empty{border:1.5px dashed var(--eh-border);border-radius:var(--eh-radius-md);padding:var(--eh-space-7) var(--eh-space-5);text-align:center;background:var(--eh-surface)}
+.empty h3{font-family:var(--eh-font-display);font-weight:500;font-size:var(--eh-display-sm)}
+.empty p{color:var(--eh-text-muted);margin:var(--eh-space-3) auto var(--eh-space-5);max-width:44ch}
+footer{background:var(--eh-surface-inverse);color:var(--eh-text-inverse)}
+footer .wrap{padding-block:var(--eh-space-7);display:flex;flex-wrap:wrap;gap:var(--eh-space-4);justify-content:space-between;align-items:baseline}
+footer .mark{color:var(--eh-cream);margin:0}
+footer p{color:#c9d1dc;font-size:var(--eh-text-sm)}
+
+@media(max-width:900px){
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cards .card:nth-child(3){display:none}
+  .split{grid-template-columns:minmax(0,1fr)}
+  .search{grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-radius:var(--eh-radius-md)}
+  .field:first-child{grid-column:1/-1}
+  .search{gap:4px}
+  .field+.field::before{left:18px;right:18px;top:-2px;bottom:auto;width:auto;height:1px}
+  .search .btn{grid-column:1/-1;margin:8px 0 0;width:100%}
+}
+@media(max-width:600px){
+  .nav a.l{display:none}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .cards .card:nth-child(3){display:flex}
+  .search{grid-template-columns:minmax(0,1fr)}
+  .swatches{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scale .s{grid-template-columns:minmax(0,1fr)}
+  .chips{flex-wrap:nowrap;overflow-x:auto;margin-inline:calc(var(--eh-gutter)*-1);padding-inline:var(--eh-gutter);scrollbar-width:none}
+  .chip{flex:none}
+  table{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap nav">
+  <a class="mark" href="#top">EVENT HUB</a>
+  <a class="l" href="#cards">Explore</a>
+  <a class="l" href="#components">For organizers</a>
+  <a class="l" href="#components">Sign in</a>
+  <a class="btn btn-primary" href="#components">Create event</a>
+</header>
+
+<main id="top">
+<section class="wrap hero" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="reveal">Find something worth leaving the house for.</h1>
+  <p class="lead reveal d2">Concerts, talks, workshops and gatherings near you, from organizers you can trust.</p>
+  <form class="search reveal d3" role="search" id="search">
+    <div class="field"><label for="q">What</label><input id="q" placeholder="Jazz, design talk, pottery…" autocomplete="off"></div>
+    <div class="field"><label for="where">Where</label><input id="where" placeholder="City or venue" autocomplete="off"></div>
+    <div class="field"><label for="when">When</label>
+      <select id="when"><option>Any date</option><option>Today</option><option>This weekend</option><option>Next 7 days</option><option>Choose dates…</option></select></div>
+    <button class="btn btn-primary btn-lg" type="submit">Search events</button>
+  </form>
+  <div class="chips" role="group" aria-label="Categories" id="chips"></div>
+</section>
+
+<section class="wrap band" id="cards" aria-labelledby="up-title" style="padding-top:8px">
+  <div class="row-head">
+    <h2 id="up-title">This weekend</h2>
+    <a href="#cards">See all events this weekend</a>
+  </div>
+  <div class="cards" id="cardlist"></div>
+  <p class="note sample">Sample events, drawn placeholders and prices for this style guide only. Production cards render organizer photography and live database records.</p>
+</section>
+
+<section class="band" style="background:var(--eh-surface)" aria-labelledby="col-title">
+  <div class="wrap split">
+    <div>
+      <h2 id="col-title">Navy carries the words, lavender marks a choice</h2>
+      <p class="lead">Six brand colours from the brief, plus a tuned warm gray and three muted status colours. Every text pairing shown passes WCAG AA.</p>
+    </div>
+    <div class="swatches" id="swatches"></div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="type-title">
+  <div class="wrap split">
+    <div>
+      <h2 id="type-title">Bodoni sets the occasion, Hanken does the work</h2>
+      <p class="lead">Display sizes are fluid between phone and desktop. Body text stays at 16px with a 66-character measure.</p>
+      <p class="note" style="margin-top:16px">Neither face includes Armenian script; Noto Serif and Noto Sans Armenian are already in the fallback stacks if the launch market needs them.</p>
+    </div>
+    <div class="scale">
+      <div class="s"><span class="k">Display L, 44–96px</span><span class="d-lg">Live tonight</span></div>
+      <div class="s"><span class="k">Display M, 36–60px</span><span class="d-md">Event details title</span></div>
+      <div class="s"><span class="k">Display S, 28–40px</span><span class="d-sm">Section heading</span></div>
+      <div class="s"><span class="k">Text L, 20px 600</span><span class="t-lg">Card title and lead paragraph</span></div>
+      <div class="s"><span class="k">Text, 16px</span><span>Body copy for descriptions, forms and anything people read in full.</span></div>
+      <div class="s"><span class="k">Text S, 14px</span><span class="t-sm">Meta: venue, time, organizer name</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="components" style="background:var(--eh-surface)" aria-labelledby="comp-title">
+  <div class="wrap split">
+    <div>
+      <h2 id="comp-title">Controls are calm until touched</h2>
+      <p class="lead">Pill buttons, 10px inputs, 16px cards, 28px sheets: the radius grows with the size of the thing. Every target is at least 44px.</p>
+    </div>
+    <div>
+      <div class="controls">
+        <button class="btn btn-primary">Get tickets</button>
+        <button class="btn btn-secondary">Save event</button>
+        <button class="btn btn-quiet">Share</button>
+        <button class="btn btn-primary" disabled>Sold out</button>
+      </div>
+      <div class="controls">
+        <span class="badge b-ok">Available</span>
+        <span class="badge b-warn">12 tickets left</span>
+        <span class="badge b-off">Sales ended</span>
+        <span class="badge b-lav">Featured</span>
+      </div>
+      <div class="input"><label for="em">Email</label><input id="em" type="email" placeholder="you@example.com"><span class="help">We send your tickets here.</span></div>
+      <div class="input err"><label for="qty">Tickets</label><input id="qty" value="12" inputmode="numeric"><span class="help">You can book up to 10 tickets for this event.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="empty-title">
+  <div class="wrap split">
+    <div>
+      <h2 id="empty-title">Empty is an invitation, never fake data</h2>
+      <p class="lead">When the database has nothing to show, the page says so and offers the next step.</p>
+    </div>
+    <div class="empty">
+      <h3>No events this weekend yet</h3>
+      <p>Organizers in your city haven't published anything for these dates. Try the next 30 days, or host one yourself.</p>
+      <div class="controls" style="justify-content:center;margin:0"><button class="btn btn-primary">Show next 30 days</button><button class="btn btn-secondary">Create an event</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="background:var(--eh-surface)" aria-labelledby="motion-title">
+  <div class="wrap split">
+    <div>
+      <h2 id="motion-title">One entrance, then motion only answers a touch</h2>
+      <p class="lead">All durations drop to zero when someone asks their system for reduced motion.</p>
+    </div>
+    <table>
+      <thead><tr><th>Moment</th><th>Behaviour</th><th>Token</th></tr></thead>
+      <tbody>
+        <tr><td>Page load</td><td>Hero title, lead and search rise 14px and fade in, staggered 90ms. Happens once.</td><td>slow 600ms, ease-out</td></tr>
+        <tr><td>Card hover</td><td>Card lifts 4px, navy-tinted shadow appears, photo scales to 104%.</td><td>base 240ms / slow 600ms</td></tr>
+        <tr><td>Save</td><td>Heart fills and pops to 118% and back.</td><td>320ms, ease-out</td></tr>
+        <tr><td>Chip select</td><td>Fill crossfades to lavender.</td><td>base 240ms</td></tr>
+        <tr><td>Press</td><td>Buttons scale to 97%.</td><td>fast 140ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="mark">EVENT HUB</p>
+    <p>Design system v0.1, tokens in design-system/tokens.css</p>
+  </div>
+</footer>
+
+<script>
+{
+  const cats = ['All events','Music','Arts','Talks','Workshops','Food and drink','Community','Sports'];
+  const chips = document.getElementById('chips');
+  chips.innerHTML = cats.map((c,i)=>`<button class="chip" type="button" aria-pressed="${i===0}">${c}</button>`).join('');
+  chips.addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    chips.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  });
+
+  // Drawn stand-ins for event photography (remote images cannot load in this preview).
+  const art = {
+    concert: `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="300" fill="#293D56"/><path d="M200 0 L60 300 H340 Z" fill="#526780" opacity=".55"/><path d="M200 0 L140 300 H260 Z" fill="#C9C1D9" opacity=".5"/><ellipse cx="200" cy="210" rx="150" ry="22" fill="#1E2D40"/><g fill="#1E2D40">${Array.from({length:14},(_,i)=>`<circle cx="${18+i*28}" cy="${262+(i%3)*6}" r="15"/><rect x="${4+i*28}" y="${272+(i%3)*6}" width="28" height="40" rx="12"/>`).join('')}</g><circle cx="200" cy="168" r="10" fill="#FAF8F4"/><rect x="190" y="178" width="20" height="34" rx="8" fill="#FAF8F4"/></svg>`,
+    gallery: `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="300" fill="#E6D9C9"/><rect y="228" width="400" height="72" fill="#D6C5B0"/><rect x="48" y="62" width="104" height="132" fill="#FAF8F4"/><rect x="58" y="72" width="84" height="112" fill="#526780"/><circle cx="100" cy="112" r="22" fill="#C9C1D9"/><rect x="186" y="84" width="72" height="88" fill="#FAF8F4"/><rect x="194" y="92" width="56" height="72" fill="#293D56"/><rect x="290" y="56" width="74" height="74" fill="#FAF8F4"/><rect x="298" y="64" width="58" height="58" fill="#C9C1D9"/><rect x="298" y="98" width="58" height="24" fill="#526780"/><circle cx="238" cy="196" r="11" fill="#293D56"/><rect x="226" y="206" width="24" height="56" rx="10" fill="#293D56"/></svg>`,
+    talk: `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="300" fill="#ECE8F3"/><rect x="40" y="40" width="210" height="128" rx="4" fill="#293D56"/><rect x="62" y="64" width="120" height="10" rx="5" fill="#C9C1D9"/><rect x="62" y="86" width="160" height="6" rx="3" fill="#526780"/><rect x="62" y="100" width="140" height="6" rx="3" fill="#526780"/><rect x="62" y="114" width="150" height="6" rx="3" fill="#526780"/><rect x="286" y="150" width="70" height="90" rx="6" fill="#E6D9C9"/><circle cx="320" cy="112" r="16" fill="#293D56"/><rect x="302" y="128" width="36" height="40" rx="14" fill="#293D56"/><rect y="240" width="400" height="60" fill="#C9C1D9"/><g fill="#526780">${Array.from({length:9},(_,i)=>`<circle cx="${24+i*46}" cy="${268}" r="14"/>`).join('')}</g></svg>`
+  };
+  const events = [
+    {art:'concert', m:'Mar', d:'14', title:'Late Set: piano trio by candlelight', meta:'Sat, 8:00 pm, Small Hall, Old Town', price:'From $28', badge:['b-warn','12 left']},
+    {art:'gallery', m:'Mar', d:'15', title:'Printmaking open studio', meta:'Sun, 11:00 am, Atelier North', price:'Free', badge:['b-ok','Available']},
+    {art:'talk', m:'Mar', d:'15', title:'How cities remember: a talk on public memory', meta:'Sun, 6:30 pm, City Library', price:'From $12', badge:['b-lav','Featured']}
+  ];
+  const heart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg>';
+  document.getElementById('cardlist').innerHTML = events.map(e => `
+    <article class="card">
+      <div class="photo">${art[e.art]}<button class="fav" type="button" aria-pressed="false" aria-label="Save ${e.title}">${heart}</button></div>
+      <div class="tear" aria-hidden="true"></div>
+      <div class="stub">
+        <div class="date" aria-label="${e.m} ${e.d}"><span class="m">${e.m}</span><span class="d">${e.d}</span></div>
+        <div>
+          <h3>${e.title}</h3>
+          <p class="meta">${e.meta}</p>
+          <div class="foot"><span class="price">${e.price}</span><span class="badge ${e.badge[0]}">${e.badge[1]}</span></div>
+        </div>
+      </div>
+    </article>`).join('');
+  document.getElementById('cardlist').addEventListener('click', e => {
+    const f = e.target.closest('.fav'); if (!f) return;
+    const on = f.getAttribute('aria-pressed') !== 'true';
+    f.setAttribute('aria-pressed', String(on));
+    f.classList.remove('pop'); void f.offsetWidth; if (on) f.classList.add('pop');
+  });
+  document.getElementById('search').addEventListener('submit', e => e.preventDefault());
+
+  const sw = [
+    ['Warm ivory','#F5F0E8','Page canvas','var(--eh-ivory)'],
+    ['Soft cream','#FAF8F4','Cards, raised surfaces','var(--eh-cream)'],
+    ['Beige','#E6D9C9','Quiet fills, image ground','var(--eh-beige)'],
+    ['Dusty navy','#293D56','Text 10.4:1, primary actions','var(--eh-navy)'],
+    ['Muted blue','#526780','Secondary text 5.5:1, links','var(--eh-blue)'],
+    ['Soft lavender','#C9C1D9','Selected chips, highlights','var(--eh-lavender)'],
+    ['Warm gray','#6F6A63','Meta text 5.1:1 (proposed)','var(--eh-gray-600)'],
+    ['Navy deep','#1E2D40','Pressed state, footer (proposed)','var(--eh-navy-deep)'],
+    ['Lavender deep','#5E5478','Lavender as text 6.6:1 (proposed)','var(--eh-lavender-deep)']
+  ];
+  document.getElementById('swatches').innerHTML = sw.map(s => `<div class="sw"><div class="c" style="background:${s[3]}"></div><div class="t"><b>${s[0]}</b><span>${s[1]}</span><span>${s[2]}</span></div></div>`).join('');
+}
+</script>
+</body>
+</html>
