@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { atLeastOne } from "@/lib/static-params";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -10,7 +11,7 @@ import { plural } from "@/lib/format";
 import { Monogram } from "@/components/ui/Monogram";
 
 export async function generateStaticParams() {
-  return (await getOrganizerSlugs()).map((slug) => ({ slug }));
+  return atLeastOne(await getOrganizerSlugs());
 }
 
 export async function generateMetadata({ params }: PageProps<"/organizers/[slug]">): Promise<Metadata> {
