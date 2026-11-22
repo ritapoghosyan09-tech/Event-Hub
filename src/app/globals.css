@@ -1,0 +1,134 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/theme.css";
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+html {
+  background: var(--eh-canvas);
+  color: var(--eh-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-padding-top: 88px;
+}
+body {
+  font-family: var(--eh-font-text);
+  font-size: var(--eh-text-base);
+  line-height: var(--eh-leading-body);
+  overflow-x: clip;
+}
+::selection {
+  background: var(--eh-lavender);
+  color: var(--eh-navy-deep);
+}
+:focus-visible {
+  outline: none;
+  box-shadow: var(--eh-focus-ring);
+  border-radius: 6px;
+}
+.font-display {
+  font-family: var(--eh-font-display);
+  font-optical-sizing: auto;
+  letter-spacing: var(--eh-tracking-display);
+}
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+/* Shared layout primitives ------------------------------------------------- */
+.shell {
+  width: 100%;
+  max-width: var(--eh-content-max);
+  margin-inline: auto;
+  padding-inline: var(--eh-gutter);
+}
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* The ticket-stub perforation (signature element, used once per card) ----- */
+.tear {
+  position: relative;
+  height: 0;
+  border-top: 1.5px dashed var(--eh-border);
+}
+.tear::before,
+.tear::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--tear-bg, var(--eh-canvas));
+}
+.tear::before { left: -11px; }
+.tear::after { right: -11px; }
+
+/* Pill select with a drawn chevron --------------------------------------- */
+.select-pill {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%23293D56' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 14px;
+  background-position: right 14px center;
+}
+
+/* Loading shimmer (skeletons) ---------------------------------------------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--eh-gray-200);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(250, 248, 244, 0.6), transparent);
+  animation: shimmer 1.6s var(--eh-ease-in-out) infinite;
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+/* Slow drift for hero photography (the one ambient motion) ---------------- */
+@keyframes drift {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.14) translate3d(-1.5%, -1%, 0); }
+}
+.drift { animation: drift 22s var(--eh-ease-in-out) infinite alternate; will-change: transform; }
+
+/* Page entrance (app/template.tsx remounts per navigation) --------------- */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter { animation: page-in 520ms var(--eh-ease-out) both; }
+
+/* Shared-element morph for event photos (React <ViewTransition>) --------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--eh-ease-out);
+}
+::view-transition-group(.event-photo) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--eh-ease-out);
+}
+::view-transition-image-pair(.event-photo) {
+  animation-name: photo-soften;
+}
+@keyframes photo-soften { 35% { filter: blur(2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .drift, .skeleton::after, .page-enter { animation: none; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
+}
+
+@keyframes eh-pending {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="eh-pending"] { animation: none; }
+}

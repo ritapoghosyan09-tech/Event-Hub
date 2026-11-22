@@ -1,0 +1,149 @@
+/* ==========================================================================
+   EVENT HUB — design tokens v0.2 (v0.1 + night tones for immersive bands)
+   Source of truth for colour, type, space, radius, elevation and motion.
+   Components use the SEMANTIC tokens (--eh-surface, --eh-text …), never the
+   primitives directly, so a future dark theme only remaps semantics.
+
+   Contrast (WCAG 2.2, measured):
+     navy  #293D56 on cream #FAF8F4 ... 10.4:1   body text, headings
+     navy  #293D56 on ivory #F5F0E8 ...  9.8:1
+     blue  #526780 on cream ...........  5.5:1   secondary text (AA)
+     gray  #6F6A63 on cream ...........  5.1:1   meta text (AA)
+     cream on navy ....................  10.4:1  primary button label
+     navy  on lavender #C9C1D9 ........  6.4:1   selected chip
+     blue  on beige #E6D9C9 ...........  4.2:1   large text / icons ONLY
+   ========================================================================== */
+
+:root {
+  /* ---- Primitives: the brand palette (confirmed in brief) ---------------- */
+  --eh-ivory: #f5f0e8;      /* warm ivory — page canvas */
+  --eh-cream: #faf8f4;      /* soft cream — raised surfaces, cards */
+  --eh-beige: #e6d9c9;      /* beige — quiet fills, dividers, tags */
+  --eh-navy: #293d56;       /* dusty navy — primary ink + primary actions */
+  --eh-blue: #526780;       /* muted blue — secondary ink, links */
+  --eh-lavender: #c9c1d9;   /* soft lavender — selection, accents */
+
+  /* ---- Primitives: derived (recommendation, not in brief) ---------------- */
+  --eh-navy-deep: #1e2d40;  /* pressed state, footer ground */
+  --eh-navy-hover: #1f3047;
+  --eh-lavender-tint: #ece8f3;
+  --eh-lavender-deep: #5e5478; /* lavender as text: 6.6:1 on cream */
+  --eh-beige-deep: #d6c5b0;    /* borders on ivory */
+  --eh-gray-600: #6f6a63;      /* "warm gray" from the brief, tuned for AA */
+  --eh-gray-400: #8c867e;      /* disabled, placeholders (3.4:1 — non-essential only) */
+  --eh-gray-200: #e3ded6;
+  --eh-white: #ffffff;
+  --eh-night: #141f2d;        /* immersive bands: hero scrim, footer (v0.2) */
+  --eh-night-soft: #1b2939;
+  --eh-red: #9b3d3d;    /* muted, not alarm-red: errors */
+  --eh-green: #3d6b52;  /* confirmed, available */
+  --eh-amber: #8a6420;  /* few tickets left */
+
+  /* ---- Semantic: surfaces ------------------------------------------------- */
+  --eh-canvas: var(--eh-ivory);
+  --eh-surface: var(--eh-cream);
+  --eh-surface-sunken: var(--eh-beige);
+  --eh-surface-inverse: var(--eh-navy);
+  --eh-surface-accent: var(--eh-lavender-tint);
+
+  /* ---- Semantic: text ----------------------------------------------------- */
+  --eh-text: var(--eh-navy);
+  --eh-text-strong: var(--eh-navy-deep);
+  --eh-text-muted: var(--eh-blue);
+  --eh-text-subtle: var(--eh-gray-600);
+  --eh-text-disabled: var(--eh-gray-400);
+  --eh-text-inverse: var(--eh-cream);
+  --eh-text-accent: var(--eh-lavender-deep);
+  --eh-link: var(--eh-blue);
+
+  /* ---- Semantic: lines & focus ------------------------------------------- */
+  --eh-border: var(--eh-beige-deep);
+  --eh-border-subtle: var(--eh-gray-200);
+  --eh-border-strong: var(--eh-blue);
+  --eh-focus-ring: 0 0 0 2px var(--eh-cream), 0 0 0 4px var(--eh-blue);
+
+  /* ---- Semantic: actions -------------------------------------------------- */
+  --eh-action: var(--eh-navy);
+  --eh-action-hover: var(--eh-navy-hover);
+  --eh-action-pressed: var(--eh-navy-deep);
+  --eh-action-text: var(--eh-cream);
+  --eh-action-secondary: transparent;
+  --eh-action-secondary-border: var(--eh-navy);
+  --eh-selected: var(--eh-lavender);
+
+  /* ---- Semantic: status --------------------------------------------------- */
+  --eh-success: var(--eh-green);
+  --eh-warning: var(--eh-amber);
+  --eh-danger: var(--eh-red);
+
+  /* ---- Typography --------------------------------------------------------
+     Display: Bodoni Moda (high-contrast, programme/playbill lineage).
+     Text:    Hanken Grotesk (quiet, open, excellent at small sizes).
+     Armenian/Cyrillic fallbacks are listed in case the launch market needs
+     them (open question) — neither primary face covers Armenian script. */
+  --eh-font-display: var(--font-bodoni), "Bodoni Moda", "Noto Serif Armenian", "Didot", "Bodoni 72", Georgia, serif;
+  --eh-font-text: var(--font-hanken), "Hanken Grotesk", "Noto Sans Armenian", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Modular scale, ratio 1.25 from 16px, display sizes fluid */
+  --eh-text-xs: 0.8125rem;   /* 13 — legal, captions (minimum) */
+  --eh-text-sm: 0.875rem;    /* 14 — meta, labels */
+  --eh-text-base: 1rem;      /* 16 — body, inputs */
+  --eh-text-lg: 1.25rem;     /* 20 — lead paragraphs, card titles */
+  --eh-text-xl: 1.5625rem;   /* 25 — section titles (text face) */
+  --eh-display-sm: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);   /* 28→40 */
+  --eh-display-md: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);  /* 36→60 */
+  --eh-display-lg: clamp(2.75rem, 1.6rem + 5vw, 6rem);       /* 44→96 hero */
+
+  --eh-leading-tight: 1.04;  /* display */
+  --eh-leading-snug: 1.3;    /* card titles */
+  --eh-leading-body: 1.6;
+  --eh-tracking-display: -0.02em;
+  --eh-measure: 66ch;
+
+  /* ---- Space: 4px base, used in steps of 8 for layout -------------------- */
+  --eh-space-1: 0.25rem;  /* 4 */
+  --eh-space-2: 0.5rem;   /* 8 */
+  --eh-space-3: 0.75rem;  /* 12 */
+  --eh-space-4: 1rem;     /* 16 */
+  --eh-space-5: 1.5rem;   /* 24 */
+  --eh-space-6: 2rem;     /* 32 */
+  --eh-space-7: 3rem;     /* 48 */
+  --eh-space-8: 4rem;     /* 64 */
+  --eh-space-9: 6rem;     /* 96 */
+  --eh-space-10: 8rem;    /* 128 — between homepage bands on desktop */
+  --eh-gutter: max(5vw, 1rem);
+  --eh-content-max: 77.5rem; /* 1240 */
+
+  /* ---- Radius: hierarchy, not one value everywhere ----------------------- */
+  --eh-radius-xs: 4px;     /* tags, small badges */
+  --eh-radius-sm: 10px;    /* inputs */
+  --eh-radius-md: 16px;    /* cards */
+  --eh-radius-lg: 28px;    /* hero search, sheets, modals */
+  --eh-radius-pill: 999px; /* buttons, chips */
+
+  /* ---- Elevation: navy-tinted, used sparingly (hover, overlays) ---------- */
+  --eh-shadow-rest: 0 1px 0 rgba(41, 61, 86, 0.06);
+  --eh-shadow-hover: 0 18px 40px -22px rgba(41, 61, 86, 0.35);
+  --eh-shadow-overlay: 0 24px 64px -24px rgba(30, 45, 64, 0.45);
+
+  /* ---- Motion ------------------------------------------------------------ */
+  --eh-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --eh-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --eh-duration-fast: 140ms;  /* colour, focus */
+  --eh-duration-base: 240ms;  /* hover lifts, chip select */
+  --eh-duration-slow: 600ms;  /* the one page-load reveal; image zoom */
+
+  /* ---- Imagery ----------------------------------------------------------- */
+  --eh-image-ratio-card: 4 / 3;
+  --eh-image-ratio-hero: 16 / 10;
+  --eh-image-ratio-detail: 21 / 9;
+  --eh-image-scrim: linear-gradient(180deg, rgba(30, 45, 64, 0) 45%, rgba(30, 45, 64, 0.72) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --eh-duration-fast: 0ms;
+    --eh-duration-base: 0ms;
+    --eh-duration-slow: 0ms;
+  }
+}

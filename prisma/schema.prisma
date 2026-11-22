@@ -1,4 +1,4 @@
-// EVENT HUB — initial database schema (proposal v0.1, not yet migrated)
+// EVENT HUB — database schema (migrations in prisma/migrations, applied by scripts/migrate.mjs)
 // PostgreSQL 16+ · Prisma ORM 7
 //
 // Conventions
@@ -36,7 +36,6 @@ model User {
   image          String?
   role           PlatformRole @default(USER)
   city           String? // home city for "near me" defaults; user-entered
-  marketingOptIn Boolean      @default(false)
   createdAt      DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime     @updatedAt @db.Timestamptz(6)
 
@@ -45,7 +44,6 @@ model User {
   memberships   OrganizationMember[]
   bookings      Booking[]
   favorites     Favorite[]
-  reviews       Review[]
   notifications NotificationLog[]
   checkIns      Ticket[]             @relation("CheckedInBy")
 
@@ -131,7 +129,6 @@ model Organization {
   type         OrganizationType
   bio          String?
   logoUrl      String?
-  coverUrl     String?
   websiteUrl   String?
   contactEmail String
   verified     Boolean            @default(false)
@@ -173,7 +170,6 @@ model Category {
   id        String  @id
   slug      String  @unique
   name      String
-  iconKey   String? // maps to an icon in the design system, not a URL
   sortOrder Int     @default(0)
   isActive  Boolean @default(true)
   events    Event[]
@@ -185,13 +181,12 @@ model Venue {
   id             String        @id
   name           String
   addressLine1   String
-  addressLine2   String?
   city           String
   region         String?
   postalCode     String?
   countryCode    String        @db.Char(2)
-  latitude       Decimal       @db.Decimal(9, 6)
-  longitude      Decimal       @db.Decimal(9, 6)
+  latitude       Decimal?      @db.Decimal(9, 6) // null until geocoded
+  longitude      Decimal?      @db.Decimal(9, 6)
   timezone       String // IANA, e.g. "Asia/Yerevan"
   organizationId String? // venues are created by organizers; shared venues later
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
@@ -238,7 +233,6 @@ model Event {
   timezone       String
   status         EventStatus     @default(DRAFT)
   visibility     EventVisibility @default(PUBLIC)
-  capacity       Int? // optional overall cap across ticket types
   ageRestriction Int?
   refundPolicy   String?
 
@@ -267,7 +261,6 @@ model Event {
   ticketTypes  TicketType[]
   bookings     Booking[]
   favorites    Favorite[]
-  reviews      Review[]
 
   @@index([status, visibility, startsAt])
   @@index([categoryId, startsAt])
@@ -283,13 +276,11 @@ model EventImage {
   alt         String
   width       Int
   height      Int
-  blurDataUrl String? // tiny placeholder for elegant loading
-  isCover     Boolean  @default(false)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
   event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@index([eventId, sortOrder])
+  @@unique([eventId, sortOrder])
   @@map("event_images")
 }
 
@@ -342,7 +333,7 @@ enum BookingStatus {
 model Booking {
   id             String        @id
   code           String        @unique // short human-readable reference, e.g. "EH-7K3Q9P"
-  userId         String
+  userId         String? // null for guest bookings until a verified account with this email claims them
   eventId        String
   status         BookingStatus @default(PENDING)
   subtotalMinor  Int
@@ -358,13 +349,12 @@ model Booking {
   createdAt      DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
 
-  user          User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user          User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
   event         Event             @relation(fields: [eventId], references: [id], onDelete: Restrict)
   items         BookingItem[]
   tickets       Ticket[]
   payments      Payment[]
   notifications NotificationLog[]
-  review        Review?
 
   @@index([userId, createdAt])
   @@index([eventId, status])
@@ -474,29 +464,7 @@ model Favorite {
   @@map("favorites")
 }
 
-enum ReviewStatus {
-  PUBLISHED
-  HIDDEN // moderated
-}
 
-// Only attendees with a CONFIRMED booking for a past event may review (enforced in the service layer).
-model Review {
-  id        String       @id
-  eventId   String
-  userId    String
-  bookingId String       @unique
-  rating    Int // 1–5, DB CHECK in raw migration
-  body      String?
-  status    ReviewStatus @default(PUBLISHED)
-  createdAt DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime     @updatedAt @db.Timestamptz(6)
-  event     Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  booking   Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
-  @@unique([eventId, userId])
-  @@map("reviews")
-}
 
 enum NotificationType {
   BOOKING_CONFIRMATION
@@ -504,17 +472,19 @@ enum NotificationType {
   REMINDER_2H
   EVENT_UPDATED
   EVENT_CANCELLED
+  BOOKING_CANCELLED
 }
 
 // Prevents duplicate emails when a job retries; also the audit trail of what was sent.
 model NotificationLog {
   id        String           @id
-  userId    String
+  userId    String? // null for guest bookings
   bookingId String?
   type      NotificationType
   channel   String           @default("email")
+  recipient String // address the message went to
   sentAt    DateTime         @default(now()) @db.Timestamptz(6)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
   booking   Booking?         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@unique([bookingId, type, channel])

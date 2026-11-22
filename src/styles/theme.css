@@ -1,0 +1,77 @@
+/* EVENT HUB — Tailwind CSS v4 theme bridge
+   Import order in src/app/globals.css:
+     @import "tailwindcss";
+     @import "../../design-system/tokens.css";
+     @import "../../design-system/theme.css";
+   Utilities then read the tokens: bg-canvas, text-ink, font-display, rounded-card … */
+
+@theme inline {
+  /* Colours — semantic names only; primitives stay in tokens.css */
+  --color-canvas: var(--eh-canvas);
+  --color-surface: var(--eh-surface);
+  --color-sunken: var(--eh-surface-sunken);
+  --color-inverse: var(--eh-surface-inverse);
+  --color-night: var(--eh-night);
+  --color-night-soft: var(--eh-night-soft);
+  --color-navy: var(--eh-navy);
+  --color-lavender: var(--eh-lavender);
+  --color-beige: var(--eh-beige);
+  --color-cream: var(--eh-cream);
+  --color-ivory: var(--eh-ivory);
+  --color-accent-surface: var(--eh-surface-accent);
+
+  --color-ink: var(--eh-text);
+  --color-ink-strong: var(--eh-text-strong);
+  --color-ink-muted: var(--eh-text-muted);
+  --color-ink-subtle: var(--eh-text-subtle);
+  --color-ink-disabled: var(--eh-text-disabled);
+  --color-ink-inverse: var(--eh-text-inverse);
+  --color-ink-accent: var(--eh-text-accent);
+
+  --color-line: var(--eh-border);
+  --color-line-subtle: var(--eh-border-subtle);
+  --color-line-strong: var(--eh-border-strong);
+
+  --color-action: var(--eh-action);
+  --color-action-hover: var(--eh-action-hover);
+  --color-action-pressed: var(--eh-action-pressed);
+  --color-selected: var(--eh-selected);
+
+  --color-success: var(--eh-success);
+  --color-warning: var(--eh-warning);
+  --color-danger: var(--eh-danger);
+
+  /* Type */
+  --font-display: var(--eh-font-display);
+  --font-sans: var(--eh-font-text);
+
+  --text-xs: var(--eh-text-xs);
+  --text-sm: var(--eh-text-sm);
+  --text-base: var(--eh-text-base);
+  --text-lg: var(--eh-text-lg);
+  --text-xl: var(--eh-text-xl);
+  --text-display-sm: var(--eh-display-sm);
+  --text-display-sm--line-height: var(--eh-leading-tight);
+  --text-display-md: var(--eh-display-md);
+  --text-display-md--line-height: var(--eh-leading-tight);
+  --text-display-lg: var(--eh-display-lg);
+  --text-display-lg--line-height: var(--eh-leading-tight);
+
+  /* Radius */
+  --radius-tag: var(--eh-radius-xs);
+  --radius-input: var(--eh-radius-sm);
+  --radius-card: var(--eh-radius-md);
+  --radius-sheet: var(--eh-radius-lg);
+
+  /* Elevation */
+  --shadow-rest: var(--eh-shadow-rest);
+  --shadow-hover: var(--eh-shadow-hover);
+  --shadow-overlay: var(--eh-shadow-overlay);
+
+  /* Motion */
+  --ease-out-soft: var(--eh-ease-out);
+  --ease-in-out-soft: var(--eh-ease-in-out);
+
+  /* Layout */
+  --container-content: var(--eh-content-max);
+}
