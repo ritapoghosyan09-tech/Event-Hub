@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { atLeastOne } from "@/lib/static-params";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -16,7 +17,7 @@ import { Monogram } from "@/components/ui/Monogram";
 import { cityTimeZoneNote, longDate, priceLabel, timeRange } from "@/lib/format";
 
 export async function generateStaticParams() {
-  return (await getEventSlugs()).map((slug) => ({ slug }));
+  return atLeastOne(await getEventSlugs());
 }
 
 export async function generateMetadata({ params }: PageProps<"/events/[slug]">): Promise<Metadata> {
